@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark-bg: #0b0f19;
+  --color-dark-panel: #111827;
+  --color-dark-border: rgba(255, 255, 255, 0.05);
+  
+  /* Primary sleek accent */
+  --color-accent-blue: #3b82f6;
+  --color-accent-indigo: #6366f1;
+
+  --font-inter: 'Inter', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-gray-100 font-inter antialiased;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+.glass-panel {
+  @apply bg-dark-panel/70 backdrop-blur-xl border border-dark-border shadow-2xl rounded-2xl;
+}
