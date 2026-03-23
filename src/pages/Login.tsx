@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, KeyRound, Loader2, Dumbbell } from 'lucide-react';
+import { setToken } from '../auth';
 
 export default function Login() {
     const [phone, setPhone] = useState('');
@@ -10,6 +11,8 @@ export default function Login() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    const API = import.meta.env.VITE_API_URL || '';
+
     const handleSendOtp = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!phone) return;
@@ -18,7 +21,7 @@ export default function Login() {
         setError('');
 
         try {
-            const res = await fetch('/api/auth/login', {
+            const res = await fetch(`${API}/api/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phone }),
@@ -41,15 +44,16 @@ export default function Login() {
         setError('');
 
         try {
-            const res = await fetch('/api/auth/verify', {
+            const res = await fetch(`${API}/api/auth/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone, code: otp }),
+                body: JSON.stringify({ phone, otp }),  // backend expects "otp"
             });
 
             if (!res.ok) throw new Error('Invalid OTP code');
 
-            // Navigate to dashboard on success
+            const data = await res.json();
+            if (data.token) setToken(data.token);
             navigate('/trainees');
         } catch (err: any) {
             setError(err.message);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Users, Activity, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { authHeaders } from '../auth';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
     return twMerge(clsx(inputs));
@@ -63,32 +64,28 @@ function ChurnBadge({ risk }: { risk: Trainee['churnRisk'] }) {
     );
 }
 
+const MOCK: Trainee[] = [
+    { id: 1, name: 'Alex Johnson', phone: '+972501112222', status: 'active', churnRisk: 'Low', recentScores: [4, 5, 4, 3, 5] },
+    { id: 2, name: 'Sarah Miller', phone: '+972503334444', status: 'active', churnRisk: 'Medium', recentScores: [3, 2, 3, 4, 3] },
+    { id: 3, name: 'David Cohen', phone: '+972505556666', status: 'inactive', churnRisk: 'High', recentScores: [1, 2, 1, 1] },
+];
+
 export default function Trainees() {
     const [trainees, setTrainees] = useState<Trainee[]>([]);
     const [loading, setLoading] = useState(true);
+    const API = import.meta.env.VITE_API_URL || '';
 
     useEffect(() => {
-        async function fetchTrainees() {
+        async function load() {
             try {
-                const res = await fetch('/api/coach/trainees');
-                if (res.ok) {
-                    const data = await res.json();
-                    setTrainees(data);
-                } else {
-                    // If no backend, use mock data for design showcase
-                    setTrainees([
-                        { id: 1, name: 'Alex Johnson', phone: '+972501112222', status: 'active', churnRisk: 'Low', recentScores: [4, 5, 4, 3, 5] },
-                        { id: 2, name: 'Sarah Miller', phone: '+972503334444', status: 'active', churnRisk: 'Medium', recentScores: [3, 2, 3, 4, 3] },
-                        { id: 3, name: 'David Cohen', phone: '+972505556666', status: 'inactive', churnRisk: 'High', recentScores: [1, 2, 1, 1] },
-                    ]);
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
+                const res = await fetch(`${API}/api/coach/trainees`, {
+                    headers: { 'Content-Type': 'application/json', ...authHeaders() },
+                });
+                setTrainees(res.ok ? await res.json() : MOCK);
+            } catch { setTrainees(MOCK); }
+            finally { setLoading(false); }
         }
-        fetchTrainees();
+        load();
     }, []);
 
     return (
