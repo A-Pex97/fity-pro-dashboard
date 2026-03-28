@@ -73,15 +73,14 @@ export default function Trainees() {
                 });
                 if (res.ok) {
                     const json = await res.json();
-                    setTrainees(json.data?.trainees ?? json);
+                    // Backend returns { ok: true, data: { trainees: [...] } }
+                    const list = json?.data?.trainees ?? json?.trainees ?? json;
+                    setTrainees(Array.isArray(list) ? list : MOCK);
                 } else {
                     setTrainees(MOCK);
                 }
-            } catch {
-                setTrainees(MOCK);
-            } finally {
-                setLoading(false);
-            }
+            } catch { setTrainees(MOCK); }
+            finally { setLoading(false); }
         }
         load();
     }, []);
