@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { loadConnectAndInitialize } from '@stripe/connect-js';
 import { ConnectComponentsProvider, ConnectPayouts } from '@stripe/react-connect-js';
 import { CreditCard, Loader2 } from 'lucide-react';
+import { authHeaders } from '../auth';
+
+const API = import.meta.env.VITE_API_URL || '';
 
 export default function Payouts() {
     const [stripeConnectInstance, setStripeConnectInstance] = useState<any>(null);
@@ -9,11 +12,17 @@ export default function Payouts() {
     const [error, setError] = useState('');
 
     const fetchClientSecret = async () => {
-        // Backend creates an Account Session using the logged-in coach's connected stripe_account_id
-        const response = await fetch('/stripe/connect/session', { method: 'POST' });
+        const response = await fetch(`${API}/api/stripe/connect/session`, {
+            method: 'POST',
+            headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+        });
         if (!response.ok) {
-            const { error } = await response.json();
-            throw new Error(error || 'Failed to create Stripe Account Session');
+            if (response.status === 401) {
+                window.location.href = '/login';
+                throw new Error('Session expired');
+            }
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to create Stripe Account Session');
         }
         const { client_secret } = await response.json();
         return client_secret;
