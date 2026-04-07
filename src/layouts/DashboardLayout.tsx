@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { Users, CreditCard, LogOut } from 'lucide-react';
+import { Users, CreditCard, LogOut, LayoutDashboard, Activity } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { isLoggedIn, clearToken } from '../auth';
@@ -10,7 +10,9 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 }
 
 const SIDEBAR_LINKS = [
+    { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
     { name: 'Trainees', icon: Users, path: '/trainees' },
+    { name: 'Activity', icon: Activity, path: '/activity' },
     { name: 'Payouts', icon: CreditCard, path: '/payouts' },
 ];
 
